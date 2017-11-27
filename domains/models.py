@@ -3,6 +3,10 @@ from __future__ import unicode_literals
 
 from django.db import models
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+from managedns import updateZone
 # Create your models here.
 
 class Domain(models.Model):
@@ -36,3 +40,11 @@ class Record(models.Model):
 
   def __str__(self):
     return "{0}.{1}".format(self.name, self.domain.name)
+  
+@receiver(post_save, sender=Record)
+def update_zone_file(sender, **kwargs):
+  print 'Zone file update'
+  target = kwargs['instance']
+  print 'Record: {0}'.format(target.name)
+  print 'Domain: {0}'.format(target.domain.name)
+
