@@ -1,0 +1,21 @@
+{% extends 'users/base.html' %}
+{% debug %}
+
+{% block content %}
+<h1 class="text-center">Register</h1>
+	<div class="col-lg-12">
+	<form method="post">
+	{% csrf_token %}
+	{% for field in form %}
+	  <div class="form-group">
+	    {{ field.errors }}
+	    {{ field.label_tag }} {{ field }}
+	    {% if field.help_text %}
+	    <p class="help">{{ field.help_text|safe }}</p>
+	    {% endif %}
+	  </div>
+	{% endfor %}	
+	<button type="submit">Register</button>
+	</form>
+        </div>
+{% endblock %}
