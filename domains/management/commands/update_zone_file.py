@@ -15,25 +15,15 @@ class Command(BaseCommand):
   def add_arguments(self, parser):
     parser.add_argument('domain', nargs='+', type=str)
 
-
-  def _zone_file_header(self, file_path, domain_name, serial_number):
-    with open(file_path, 'w+') as f:
-      content = f.read()
-      f.seek(0,0)
-      f.write(serial_number + '\n' + content)
-      f.close()
-
-    return True
-
   def handle(self, *args, **options):
     for domain in options['domain']:
       try:
         get_domain = Domain.objects.get(name=domain)
 	get_records = Record.objects.filter(domain=get_domain)
       except Domain.DoesNotExist:
-        raise CommandError('Domain "%s" does not exist' % domain)
+        raise CommandError('Domain "%s" does not exist' % get_domain)
       except Record.DoesNotExist:
-        raise CommandError('Records for "%s" do not exist' % domain)
+        raise CommandError('Records for "%s" do not exist' % get_domain)
 
       if get_domain and get_records:
         domain = get_domain
@@ -62,18 +52,21 @@ class Command(BaseCommand):
 
 
         # Automatically increment the serial number
-	old_serial_number = get_domain.serial_number 
-	new_serial_number = (int(get_domain.serial_number) + 1)
+	old_serial_number = domain.serial_number 
+	new_serial_number = (int(domain.serial_number) + 1)
 
 	serial_number = new_serial_number
 
-        if self._zone_file_header('conrey.us.zone'.format(domain.name), domain.name, serial_number):
-	  self.stdout.write('Successful initial write')
-	else:
-	  self.stdout.write('Problem writing header to zone file.')
+        self.stdout.write("%s\n" % serial_number)
+
+        zs = str(serial_number) + "\n" + zone.to_text('{0}.zone'.format(domain.name))
+
+	fp = "{0}.zone".format(domain.name)
+	with open(fp, 'w+') as f:
+	  f.seek(0)
+	  f.write(zs)
 
 
-
-        zone.to_file('{0}.zone'.format(domain.name))
+	self.stdout.write("%s\n" % zs)
 
 

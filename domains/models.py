@@ -7,6 +7,7 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
 from django.core.management import call_command
+from django.utils import timezone
 
 from datetime import datetime
 
@@ -14,12 +15,13 @@ from datetime import datetime
 
 class Domain(models.Model):
   default_serial = datetime.today().strftime("%Y%m%d") + "00"
- 
+  
+#  id = models.AutoField(primary_key=True, default='1')
   name = models.CharField(max_length=255)
   serial_number = models.IntegerField(default=default_serial) 
 
-  date_created = models.DateTimeField
-  date_modified = models.DateTimeField
+  date_created = models.DateTimeField(auto_now=True)
+  date_modified = models.DateTimeField(auto_now=True)
 
   def __str__(self):
     return self.name
@@ -63,6 +65,9 @@ def zone_update(domain):
 def update_zone_file(sender, **kwargs):
   target = kwargs['instance']
   zone_update(target.domain.name)
+  current_serial = target.domain.serial_number
+  target.domain.serial_number = (int(current_serial) + 1)
+  target.domain.save()
 
 @receiver(post_delete, sender=Record)
 def remove_from_zone_file(sender, **kwargs):
