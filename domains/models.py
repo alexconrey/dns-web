@@ -8,10 +8,15 @@ from django.dispatch import receiver
 
 from django.core.management import call_command
 
+from datetime import datetime
+
 # Create your models here.
 
 class Domain(models.Model):
+  default_serial = datetime.today().strftime("%Y%m%d") + "00"
+ 
   name = models.CharField(max_length=255)
+  serial_number = models.IntegerField(default=default_serial) 
 
   date_created = models.DateTimeField
   date_modified = models.DateTimeField
