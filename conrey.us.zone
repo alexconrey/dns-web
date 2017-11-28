@@ -1,2 +1,23 @@
+
+
+$TTL 300
+
+$ORIGIN conrey.us
+
+
+@	IN	SOA	conrey.us root.conrey.us (
+		2017112720	; Serial number
+		28881		; Refresh
+		3600		; Retry
+		86400		; Expire
+		3600		; Minimum
+
+
+
+
 alex.conrey.us 300 IN A 4.2.2.2
 www.conrey.us 300 IN A 127.0.0.1
+
+
+
+

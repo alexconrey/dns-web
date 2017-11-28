@@ -1,0 +1,18 @@
+{% load staticfiles %}
+
+$TTL {{ domain.ttl }}
+
+$ORIGIN {{ domain.name }}
+
+
+@	IN	SOA	{{ domain.name }} {{ domain.root_name }} (
+		{{ domain.serial_number }}	; Serial number
+		{{ domain.refresh }}		; Refresh
+		{{ domain.retry }}		; Retry
+		{{ domain.expire }}		; Expire
+		{{ domain.minimum }}		; Minimum
+
+
+{% block content %}
+{% endblock %}
+

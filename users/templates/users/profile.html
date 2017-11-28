@@ -1,33 +1,14 @@
 {% extends 'users/base.html' %}
 
 {% block content %}
-<h1 class="text-center"> Github User Data </h1>
+<h1 class="text-center">Your Profile</h1>
 	<div class="col-lg-12">
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover table-striped tablesorter">
-                <thead>
-                <tr>
-                  <th class="header"> Username <i class="icon-sort"></i></th>
-                  <th class="header"> Blog <i class="icon-sort"></i></th>
-                  <th class="header"> Public Repos <i class="icon-sort"></i></th>
-                  <th class="header"> Public Gists <i class="icon-sort"></i></th>
-                  <th class="header"> Email <i class="icon-sort"></i></th>
-                  <th class="header"> Followers <i class="icon-sort"></i></th>
-                  <th class="header"> Following <i class="icon-sort"></i></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{ name }}</td>
-                    <td>{{ blog }}</td>
-                    <td>{{ public_repos }}</td>
-                    <td>{{ public_gists }}</td>
-                    <td>{{ email }}</td>
-                    <td>{{ followers }}</td>
-                    <td>{{ following }}</td>
-                </tr>
-            
-            </tbody>
-            </table>
+	<b>Email: </b> {{ user.email }} <br />
+	<b>Username: </b> {{ user.username }} <br /> 
+	<b>First Name: </b> {{ user.first_name }} <br />
+	<b>Last Name: </b> {{ user.last_name }} <br />
+	<b>Bio: </b> {{ profile.bio }} <br />
+	<b>Last Login: </b> {{ user.last_login }} <br />
+	<b>Date Joined: </b> {{ user.date_joined }} <br />
         </div>
 {% endblock %}

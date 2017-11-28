@@ -11,6 +11,8 @@ from django.utils import timezone
 
 from datetime import datetime
 
+from django.contrib.auth.models import User
+
 # Create your models here.
 
 class Domain(models.Model):
@@ -18,7 +20,17 @@ class Domain(models.Model):
   
 #  id = models.AutoField(primary_key=True, default='1')
   name = models.CharField(max_length=255)
+  owner = models.ForeignKey(User, related_name='domain_owner', blank=True, default='1')
+
   serial_number = models.IntegerField(default=default_serial) 
+
+  ttl = models.IntegerField(default='300')
+
+  root_name = models.CharField(max_length=255, default='root.conrey.us')
+  refresh = models.IntegerField(default='28880')
+  retry   = models.IntegerField(default='3600')
+  expire  = models.IntegerField(default='86400')
+  minimum = models.IntegerField(default='3600')
 
   date_created = models.DateTimeField(auto_now=True)
   date_modified = models.DateTimeField(auto_now=True)
@@ -54,23 +66,19 @@ class Record(models.Model):
 
   def get_fqdn(self):
     return "{0}.{1}".format(self.name, self.domain.name)
-  
 
 def zone_update(domain):
   print 'Zone update'
-  print 'Domain: {0}'.format(domain)
-  call_command('update_zone_file', domain) 
+  print 'Domain: {0}'.format(domain.name)
+  call_command('update_zone_file', domain.name) 
 
 @receiver(post_save, sender=Record)
 def update_zone_file(sender, **kwargs):
   target = kwargs['instance']
-  zone_update(target.domain.name)
-  current_serial = target.domain.serial_number
-  target.domain.serial_number = (int(current_serial) + 1)
-  target.domain.save()
+  zone_update(target.domain)
 
 @receiver(post_delete, sender=Record)
 def remove_from_zone_file(sender, **kwargs):
   target = kwargs['instance']
-  zone_update(target.domain.name)
+  zone_update(target.domain)
 

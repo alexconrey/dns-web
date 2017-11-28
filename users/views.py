@@ -1,9 +1,22 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from django.utils.translation import ugettext_lazy as _
+
+from django.core.exceptions import ValidationError
 
 from django.shortcuts import render,HttpResponse,loader,redirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib import messages
+
+from django.forms.models import model_to_dict
+
+
+from forms import RegisterForm, UserForm, ProfileForm
+
+from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from models import Profile
 
 import requests
 import json
@@ -14,28 +27,36 @@ import json
 def index(request):
 	return HttpResponse('Users module')
 
+@csrf_exempt
 def profile(request):
-	jsonList = []
-	template = loader.get_template('users/profile.html')
-	req = requests.get('https://api.github.com/users/alexconrey')
-        jsonList.append(json.loads(req.content))
-        userData = {}
-        for data in jsonList:
-	  userData['name'] = data['name']
-          userData['blog'] = data['blog']
-          userData['email'] = data['email']
-          userData['public_gists'] = data['public_gists']
-          userData['public_repos'] = data['public_repos']
-          userData['avatar_url'] = data['avatar_url']
-          userData['followers'] = data['followers']
-          userData['following'] = data['following']
+	if request.method == 'POST':
+		return update_profile(request)
+	else:
+		profile = model_to_dict(Profile.objects.get(pk=request.user.id))
+		user = model_to_dict(User.objects.get(pk=request.user.id)) 
+	
+		return HttpResponse(render(request, 'users/profile.html', context={'profile': profile, 'user': user}))
 
-        return HttpResponse(render(request, 'users/profile.html', context=userData))
+@csrf_exempt
+def update_profile(request):
+	if request.method == 'POST':
+		user_form = UserForm(request.POST, instance=request.user)
+		profile_form = ProfileForm(request.POST, instance=request.user.profile)
+		try:
+			print profile_form.data
+			profile_form.save()
+			return redirect('users/profile')
+		except ValueError as e:
+			print e
+	else:
+		user_form = UserForm(instance=request.user)
+		profile_form = ProfileForm(instance=request.user.profile)
 
+	return HttpResponse(render(request, 'users/form.html', context={'forms': {profile_form}, 'title': 'Update Profile'}))
 
 def register(request):
 	if request.method == 'POST':	
-		form = UserCreationForm(request.POST)
+		form = RegisterForm(request.POST)
 		if form.is_valid():
 			form.save()
 			username = form.cleaned_data.get('username')
@@ -44,5 +65,5 @@ def register(request):
 			login(request, user)
 			return redirect('home')
 	else:
-		form = UserCreationForm()
-	return HttpResponse(render(request, 'users/register.html', context={'form': form}))
+		form = RegisterForm()
+	return HttpResponse(render(request, 'users/form.html', context={'forms': {form}, 'title': 'Register'}))

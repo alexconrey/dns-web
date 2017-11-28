@@ -1,0 +1,7 @@
+{% extends 'bind/base.zone' %}
+
+{% block content %}
+
+{{ records }}
+
+{% endblock %}

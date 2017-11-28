@@ -1,6 +1,8 @@
 from django.core.management.base import BaseCommand, CommandError
 from domains.models import Domain, Record, RecordType
 
+from django.template import Context, Template, loader
+
 import os
 import sys
 import dns.rdataset
@@ -52,21 +54,19 @@ class Command(BaseCommand):
 
 
         # Automatically increment the serial number
-	old_serial_number = domain.serial_number 
-	new_serial_number = (int(domain.serial_number) + 1)
+	domain.serial_number += 1 
+	domain.save()
 
-	serial_number = new_serial_number
+	zone_template = loader.get_template('bind/template.zone')
+	zone_text = zone.to_text('{0}.zone'.format(domain.name))
 
-        self.stdout.write("%s\n" % serial_number)
-
-        zs = str(serial_number) + "\n" + zone.to_text('{0}.zone'.format(domain.name))
+	context = {"domain": domain, "records": zone_text}
 
 	fp = "{0}.zone".format(domain.name)
 	with open(fp, 'w+') as f:
 	  f.seek(0)
-	  f.write(zs)
+	  f.write(zone_template.render(context))
 
 
-	self.stdout.write("%s\n" % zs)
 
 
