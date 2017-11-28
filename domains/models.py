@@ -10,10 +10,20 @@ from django.core.management import call_command
 from django.utils import timezone
 
 from datetime import datetime
+from servers.models import Server
 
 from django.contrib.auth.models import User
 
 # Create your models here.
+class Nameserver(models.Model):
+  name = models.CharField(max_length=255)
+  server = models.ForeignKey(Server, default='1')
+
+  date_created = models.DateTimeField(auto_now=True)
+  date_modified = models.DateTimeField(auto_now=True)
+
+  def __str__(self):
+    return self.name
 
 class Domain(models.Model):
   default_serial = datetime.today().strftime("%Y%m%d") + "00"
@@ -21,6 +31,8 @@ class Domain(models.Model):
 #  id = models.AutoField(primary_key=True, default='1')
   name = models.CharField(max_length=255)
   owner = models.ForeignKey(User, related_name='domain_owner', blank=True, default='1')
+  nameserver1 = models.ForeignKey(Nameserver, default='1', related_name='nameserver1')
+  nameserver2 = models.ForeignKey(Nameserver, default='2', related_name='nameserver2')
 
   serial_number = models.IntegerField(default=default_serial) 
 

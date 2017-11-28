@@ -21,6 +21,8 @@ class Command(BaseCommand):
     for domain_list in options['domain']:
       try:
         domain = Domain.objects.get(name=domain_list)
+	get_nameserver1 = domain.nameserver1
+	get_nameserver2 = domain.nameserver2
 	get_records = Record.objects.filter(domain=domain)
       except Domain.DoesNotExist:
         raise CommandError('Domain "%s" does not exist' % domain)
@@ -34,6 +36,8 @@ class Command(BaseCommand):
 	  self.stdout.write("%s\n" % record)
 	# create empty zone
 	zone = dns.zone.Zone(origin=domain.name) 
+
+	nameservers = {'ns': [domain.nameserver1, domain.nameserver2]} 
 
 	# add records
         for record in get_records:
@@ -51,7 +55,7 @@ class Command(BaseCommand):
 #	zone_text = zone.to_text('{0}.zone'.format(domain.name))
 	zone_text = zone.to_text()
 
-	context = {"domain": domain, "records": zone_text}
+	context = {"domain": domain, "ns": {domain.nameserver1, domain.nameserver2}, "records": zone_text}
 
 	fp = "{0}.zone".format(domain.name)
 	with open(fp, 'w+') as f:

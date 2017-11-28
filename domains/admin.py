@@ -3,12 +3,13 @@ from __future__ import unicode_literals
 
 from django.contrib import admin
 
-from .models import Domain, RecordType, Record
+from .models import Domain, RecordType, Record, Nameserver
 
 
 admin.site.register(Domain)
 admin.site.register(RecordType)
 admin.site.register(Record)
+admin.site.register(Nameserver)
 
 # Register your models here.
 
