@@ -18,27 +18,22 @@ class Command(BaseCommand):
     parser.add_argument('domain', nargs='+', type=str)
 
   def handle(self, *args, **options):
-    for domain in options['domain']:
+    for domain_list in options['domain']:
       try:
-        get_domain = Domain.objects.get(name=domain)
-	get_records = Record.objects.filter(domain=get_domain)
+        domain = Domain.objects.get(name=domain_list)
+	get_records = Record.objects.filter(domain=domain)
       except Domain.DoesNotExist:
-        raise CommandError('Domain "%s" does not exist' % get_domain)
+        raise CommandError('Domain "%s" does not exist' % domain)
       except Record.DoesNotExist:
-        raise CommandError('Records for "%s" do not exist' % get_domain)
+        raise CommandError('Records for "%s" do not exist' % domain)
 
-      if get_domain and get_records:
-        domain = get_domain
-
-
-        self.stdout.write('Domain "%s"' % get_domain)
+      if domain and get_records:
+        self.stdout.write('Domain "%s"' % domain)
 	self.stdout.write('Records for zone: \n')
 	for record in get_records:
 	  self.stdout.write("%s\n" % record)
 	# create empty zone
 	zone = dns.zone.Zone(origin=domain.name) 
-
-
 
 	# add records
         for record in get_records:
@@ -47,18 +42,14 @@ class Command(BaseCommand):
 	  else:
 	    fqdn = record
 
-
 	  record_type = getattr(dns.rdatatype, "%s" % record.record_type) # Directly use built in rdatatypes instead of looking up against list
 
 	  zone[fqdn] = dns.rdataset.from_text('IN', record_type, record.ttl, str(record.content))
 
 
-        # Automatically increment the serial number
-	domain.serial_number += 1 
-	domain.save()
-
 	zone_template = loader.get_template('bind/template.zone')
-	zone_text = zone.to_text('{0}.zone'.format(domain.name))
+#	zone_text = zone.to_text('{0}.zone'.format(domain.name))
+	zone_text = zone.to_text()
 
 	context = {"domain": domain, "records": zone_text}
 

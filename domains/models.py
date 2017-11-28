@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import pre_save, post_save, post_delete
 from django.dispatch import receiver
 
 from django.core.management import call_command
@@ -72,13 +72,33 @@ def zone_update(domain):
   print 'Domain: {0}'.format(domain.name)
   call_command('update_zone_file', domain.name) 
 
-@receiver(post_save, sender=Record)
+@receiver(pre_save)
+def update_zone_serial(sender, instance, *args, **kwargs):
+  if sender.__name__ == "Domain":
+    instance.serial_number += 1
+  if sender.__name__ == "Record":
+    domain = Domain.objects.filter(pk=instance.domain.id).get()
+    #values_list('serial_number', flat=True)
+    new_serial_number = domain.serial_number + 1
+    if Domain.objects.filter(pk=instance.domain.id).update(serial_number = new_serial_number):
+    	return True
+    else:
+    	return False
+
+@receiver(post_save)
 def update_zone_file(sender, **kwargs):
   target = kwargs['instance']
-  zone_update(target.domain)
+  target_name = None
 
-@receiver(post_delete, sender=Record)
+  if sender.__name__ == "Domain":
+  	target_name = target
+  if sender.__name__ == "Record":
+  	target_name = target.domain.name
+  
+  if target_name is not None:
+  	call_command('update_zone_file', target_name)
+
+@receiver(post_delete)
 def remove_from_zone_file(sender, **kwargs):
   target = kwargs['instance']
-  zone_update(target.domain)
 
