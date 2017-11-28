@@ -1,4 +1,5 @@
 venv/
 db.*
 */*.pyc
-*/migrations/
+*/migrations/*.py
+*/migrations/*.pyc
