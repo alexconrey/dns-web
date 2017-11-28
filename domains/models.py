@@ -19,9 +19,8 @@ class Nameserver(models.Model):
   name = models.CharField(max_length=255)
   server = models.ForeignKey(Server, default='1')
 
-  date_created = models.DateTimeField(auto_now=True)
+  date_created = models.DateTimeField(auto_now_add=True)
   date_modified = models.DateTimeField(auto_now=True)
-
   def __str__(self):
     return self.name
 
@@ -44,7 +43,7 @@ class Domain(models.Model):
   expire  = models.IntegerField(default='86400')
   minimum = models.IntegerField(default='3600')
 
-  date_created = models.DateTimeField(auto_now=True)
+  date_created = models.DateTimeField(auto_now_add=True)
   date_modified = models.DateTimeField(auto_now=True)
 
   def __str__(self):
@@ -53,8 +52,8 @@ class Domain(models.Model):
 class RecordType(models.Model):
   name = models.CharField(max_length=5)
   
-  date_created = models.DateTimeField
-  date_modified = models.DateTimeField
+  date_created = models.DateTimeField(auto_now_add=True)
+  date_modified = models.DateTimeField(auto_now=True)
 
   def __str__(self):
     return self.name
@@ -65,10 +64,8 @@ class Record(models.Model):
   record_type = models.ForeignKey(RecordType, related_name='record_type')
   ttl = models.IntegerField(default=300)
   content = models.CharField(max_length=255)
-  date_created = models.DateTimeField
-  date_modified = models.DateTimeField
-  date_created = models.DateTimeField
-  date_modified = models.DateTimeField
+  date_created = models.DateTimeField(auto_now_add=True)
+  date_modified = models.DateTimeField(auto_now=True)
 
   def __str__(self):
     return "{0}.{1}.".format(self.name, self.domain.name)
