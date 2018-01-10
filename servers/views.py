@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 
 from django.shortcuts import render, HttpResponse, redirect
 
-from .models import Server
-from .forms import ServerForm
+from .models import Server, Region
+from .forms import ServerForm, RegionForm
 
 # Create your views here.
 
@@ -20,7 +20,11 @@ def list_servers(request):
     return HttpResponse(render(request, 'servers/list_servers.html', {'servers': server_list}))
 
 def list_regions(request):
-    return HttpResponse(render(request, 'servers/list_regions.html'))
+    region_list = []
+    for region in Region.objects.values():
+        region_list.append(region)
+
+    return HttpResponse(render(request, 'servers/list_regions.html', {'regions': region_list}))
 
 def create_server(request):
         if request.method == 'POST':
@@ -33,3 +37,13 @@ def create_server(request):
             form = ServerForm()
         return HttpResponse(render(request, 'servers/create.html', {'form': form}))
 
+def create_region(request):
+        if request.method == 'POST':
+            region = Region()
+            form = RegionForm(request.POST, instance=region)
+            if form.is_valid():
+                region.save()
+                return redirect('/servers/regions/list')
+        else:
+            form = RegionForm()
+        return HttpResponse(render(request, 'servers/create_region.html', {'form': form}))
