@@ -1,0 +1,11 @@
+{% extends 'domains/base.html' %}
+
+{% block content %}
+<h1 class="text-center">Records for domain</h1>
+	<div class="col-lg-12">
+	{% for record in records %}
+	<h2>{{ record.name }}</h2>
+	<b>Serial Number: </b> {{ domain.serial_number }} <br />
+	{% endfor %}
+        </div>
+{% endblock %}
