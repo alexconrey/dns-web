@@ -29,7 +29,7 @@ def create_domain(request):
             domain = Domain()
             form = DomainForm(request.POST, instance=domain)
             if form.is_valid():
-                if not Domain.objects.filter(name = form.cleaned_data['name'])[0]:
+                if not Domain.objects.filter(name = form.cleaned_data['name']):
                     domain.save()
                 return redirect('/domains/list')
         else:
