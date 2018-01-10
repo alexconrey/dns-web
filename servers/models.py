@@ -21,8 +21,9 @@ class Server(models.Model):
     hostname = models.CharField(max_length=255)
     ip_address = models.CharField(max_length=32)
     location = models.ForeignKey(Region)
-    active = models.CharField(max_length=2, choices=ACTIVE_CHOICES, default='N')
-    ctime = models.DateTimeField()
+    is_active = models.CharField(max_length=2, choices=ACTIVE_CHOICES, default='N')
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
       return self.hostname

@@ -1,0 +1,16 @@
+{% extends 'domains/base.html' %}
+
+{% block content %}
+<h1 class="text-center">Your Domains</h1>
+	<div class="col-lg-12">
+	{% for domain in domains %}
+	<h2>{{ domain.name }}</h2>
+	<b>Date Created: </b> {{ domain.date_created }} <br />
+	<b>Date Modified: </b> {{ domain.date_modified }} <br />
+	<b>TTL: </b> {{ domain.ttl }} <br />
+	<b>Minimum: </b> {{ domain.minimum }} <br />
+	<b>Expire: </b> {{ domain.expire }} <br />
+	<b>Serial Number: </b> {{ domain.serial_number }} <br />
+	{% endfor %}
+        </div>
+{% endblock %}

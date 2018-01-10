@@ -1,0 +1,15 @@
+{% extends 'servers/base.html' %}
+
+{% block content %}
+<h1 class="text-center">Servers</h1>
+	<div class="col-lg-12">
+	{% for server in servers %}
+	<h2>{{ server.hostname }}</h2>
+	<b>Date Created: </b> {{ server.date_created }} <br />
+	<b>Date Modified: </b> {{ server.date_modified }} <br />
+	<b>Region: </b> {{ server.location }} <br />
+	<b>IP Address: </b> {{ server.ip_address }} <br />
+	<b>Active?: </b> {{ server.is_active }} <br />
+	{% endfor %}
+        </div>
+{% endblock %}
