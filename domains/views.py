@@ -20,6 +20,7 @@ def list_domains(request):
 	return HttpResponse(render(request, 'domains/list_domains.html', context={'domains': domains}))	
 
 def create_domain(request):
+    try:
         if request.method == 'POST':
             domain = Domain()
             form = DomainForm(request.POST, instance=domain)
@@ -29,3 +30,5 @@ def create_domain(request):
         else:
             form = DomainForm()
         return HttpResponse(render(request, 'domains/create.html', {'form': form}))
+    except Domain.MultipleObjectsReturned as duplicate_entry:
+        return duplicate_entry
