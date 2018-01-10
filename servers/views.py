@@ -31,7 +31,8 @@ def create_server(request):
             server = Server()
             form = ServerForm(request.POST, instance=server)
             if form.is_valid():
-                server.save()
+                if not Region.objects.filter(name = form.cleaned_data['name']):
+                    server.save()
                 return redirect('/servers/list')
         else:
             form = ServerForm()
@@ -42,7 +43,8 @@ def create_region(request):
             region = Region()
             form = RegionForm(request.POST, instance=region)
             if form.is_valid():
-                region.save()
+                if not Region.objects.filter(name = form.cleaned_data['name'])[0]:
+                    region.save()
                 return redirect('/servers/regions/list')
         else:
             form = RegionForm()
