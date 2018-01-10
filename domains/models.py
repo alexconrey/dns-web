@@ -83,9 +83,8 @@ def zone_update(domain):
 
 @receiver(pre_save)
 def update_zone_serial(sender, instance, *args, **kwargs):
-  current_serial = instance.serial_number
   if sender.__name__ == "Domain":
-    instance.serial_number = int(current_serial) + 1
+    instance.serial_number += 1
   if sender.__name__ == "Record":
     domain = Domain.objects.filter(pk=instance.domain.id).get()
     #values_list('serial_number', flat=True)
